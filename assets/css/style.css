@@ -1,0 +1,17 @@
+button{
+    margin: 5px;
+}
+
+img{
+    margin: 20px;
+}
+
+#load-more{
+    position: relative;
+    width: 100%;
+}
+
+#categories{
+    position: sticky;
+    top: 0;
+}
