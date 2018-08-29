@@ -15,3 +15,11 @@ img{
     position: sticky;
     top: 0;
 }
+
+#submit{
+    margin-top: 10px;
+}
+
+#selected{
+    background-color: darkgray; 
+}
