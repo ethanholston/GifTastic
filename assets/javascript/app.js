@@ -53,7 +53,7 @@ $(document).on("click", ".menu", function(){
     offset = 12;
     selected = $(this).text();
     $(this).removeClass("btn-secondary");
-    $(currentPage).addClass("btn-secondary");
+    $("#" + currentPage).addClass("btn-secondary");
     currentPage = $(this).attr("id");
     $("#img").empty();
     getGifs(selected, offset);
