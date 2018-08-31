@@ -94,8 +94,10 @@ $(document).on("click", ".menu", function(){
 
 $(document).on("dblclick", "img", function(){
     var newfav = "<img data-img='" + $(this).attr('data-img') + "' src='" + $(this).attr("data-still") + "' data-still='" + $(this).attr('data-still') +"' data-state='still'/>";
-    favorites.push(newfav);
-    localStorage.setItem("favorites", JSON.stringify(favorites));
+    if(favorites.indexOf(newfav) == -1){
+        favorites.push(newfav);
+        localStorage.setItem("favorites", JSON.stringify(favorites));
+    }
 });
 
 $(document).on("dblclick", ".menu", function(){
