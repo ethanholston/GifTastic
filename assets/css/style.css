@@ -17,5 +17,14 @@ img{
 }
 
 #submit{
-    margin-top: 10px;
+    margin-top: 20px;
+}
+
+.card{
+    margin-top: 20px;
+}
+
+.card-header{
+    color: white;
+    font-size: 24px;
 }

@@ -1,9 +1,11 @@
 var categories = ["yes", "LOL", "happy", "nope", "slow clap", "shut up", "wink", "wtf", "fist bump", "embarassed", "drunk", "oh snap", "omg", "idgaf", "sorry", "shocked"];
+var favorites = [];
 var queryURL;
 var currentPage;
 var offset = 0;
 var imgNum = 0;
 var startPage;
+var prevPage;
 
 function getGifs(x, y){
     queryURL = "https://api.giphy.com/v1/gifs/search?q=" + x + "&offset=" + y + "&api_key=dc6zaTOxFJmzC";    
@@ -25,6 +27,35 @@ function getGifs(x, y){
         } 
         $("#img").append(loadButton);
     });
+}
+
+function setButtons(){
+    if(localStorage.getItem("categories") == null){
+        localStorage.setItem("categories", JSON.stringify(categories));
+    } else {categories = JSON.parse(localStorage.getItem("categories"))}
+    for(i=0; i<categories.length; i++){
+        $("#categories").prepend(
+            $("<button>").attr("type", "button")
+            .addClass("btn btn-secondary menu")
+            .text(categories[i])
+            .attr("id", categories[i].split(" ").join(""))
+        );
+    }
+    $("#categories").prepend(
+        $("<button>").attr("type", "button")
+            .addClass("btn btn-secondary    ")
+            .text("FAVORITES")
+            .attr("id", "favorites")
+    );
+}
+
+function loadPage(){
+    console.log(localStorage.getItem("categories"));
+    categories = JSON.parse(localStorage.getItem("categories"));
+    var startPage = categories[Math.floor(Math.random() * categories.length)];
+    currentPage = startPage.split(" ").join("");
+    $("#" + currentPage).removeClass("btn-secondary");
+    getGifs(currentPage, offset);
 }
 
 $(document).on("click", "#submit", function(){
@@ -49,16 +80,30 @@ $(document).on("click", "#submit", function(){
     }
     
 });
+
 $(document).on("click", ".menu", function(){
+    prevPage = currentPage;
     offset = 0;
     selected = $(this).text();
     $(this).removeClass("btn-secondary");
     $("#" + currentPage).addClass("btn-secondary");
     currentPage = $(this).attr("id");
-    $("#img").empty();
+    $("#img").empty();  
     getGifs(selected, offset);
-    
 });
+
+$(document).on("dblclick", "img", function(){
+    var newfav = "<img data-img='" + $(this).attr('data-img') + "' src='" + $(this).attr("data-still") + "' data-still='" + $(this).attr('data-still') +"' data-state='still'/>";
+    favorites.push(newfav);
+    localStorage.setItem("favorites", JSON.stringify(favorites));
+});
+
+$(document).on("dblclick", ".menu", function(){
+    $(this).remove();
+    categories.splice(categories.indexOf($(this).text()), 1);
+    $("#img").empty();
+    localStorage.setItem("categories", JSON.stringify(categories));
+})
 
 $(document).on("click", "#load-more", function(){
     offset += 12;
@@ -78,29 +123,16 @@ $(document).on("click", "img", function(){
     }
 })
 
-function setButtons(){
-    for(i=0; i<categories.length; i++){
-        $("#categories").prepend(
-            $("<button>").attr("type", "button")
-            .addClass("btn btn-secondary menu")
-            .text(categories[i])
-            .attr("id", categories[i].split(" ").join(""))
-        );
+$(document).on("click", "#favorites", function(){
+    $("#" + currentPage).addClass("btn-secondary");
+    currentPage = "favorites";
+    $("#favorites").removeClass("btn-secondary");
+    favorites = JSON.parse(localStorage.getItem("favorites"));
+    $("#img").empty();
+    for(j=0; j<favorites.length; j++){
+        $("#img").append(favorites[j]);
     }
-    $("#categories").prepend(
-        $("<button>").attr("type", "button")
-            .addClass("btn btn-secondary    ")
-            .text("Favorites")
-            .attr("id", "favorites")
-    );
-}
-
-function loadPage(){
-    var startPage = categories[Math.floor(Math.random() * categories.length)];
-    currentPage = startPage.split(" ").join("");
-    $("#" + currentPage).removeClass("btn-secondary");
-    getGifs(currentPage, offset);
-}
+});
 
 setButtons();
 loadPage();
