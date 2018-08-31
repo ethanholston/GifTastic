@@ -1,9 +1,9 @@
 var categories = ["yes", "LOL", "happy", "nope", "slow clap", "shut up", "wink", "wtf", "fist bump", "embarassed", "drunk", "oh snap", "omg", "idgaf", "sorry", "shocked"];
 var queryURL;
-var selected;
 var currentPage;
 var offset = 0;
 var imgNum = 0;
+var startPage;
 
 function getGifs(x, y){
     queryURL = "https://api.giphy.com/v1/gifs/search?q=" + x + "&offset=" + y + "&api_key=dc6zaTOxFJmzC";    
@@ -12,45 +12,45 @@ function getGifs(x, y){
         method: "GET"
     }).then(function(response) {
         console.log(response);        
-        var loadButton = "<button type='button' id='load-more' class='btn btn-secondary'>Load 12 more gifs</button>";
+        var loadButton = $("<button>").attr("type", "button").attr("id", "load-more")
+        .addClass("btn btn-secondary").text("Load 12 more gifs"); 
         for(j=0; j<12; j++){
-            var imgURL = response.data[j].images.fixed_width.url;
+            var gifURL = response.data[j].images.fixed_width.url;
             var imgStill = response.data[j].images.fixed_width_still.url;
-            imgNum = "img" + j;
             var newSpan = $("<span>");
-            var imgTag = $("<img>").attr("data-img", imgURL).attr("data-still", imgStill).attr("data-state", "still");
+            var imgTag = $("<img>").attr("data-img", gifURL).attr("data-still", imgStill).attr("data-state", "still");
             imgTag.attr("src", $(imgTag).attr("data-still"));
             newSpan.append(imgTag);
-            $("#img").append(newSpan).attr("data-name", imgNum);
+            $("#img").append(imgTag);
         } 
         $("#img").append(loadButton);
     });
 }
 
-function select(){
-    for(i=0; i<categories.length; i++);
-        if(selected == categories[i]);
-        $()
-}
-
 $(document).on("click", "#submit", function(){
     event.preventDefault();
-    if($("#add").val() != ""){
+    if($("#add").val() != "" && categories.indexOf($("#add").val().trim()) == -1){
+        categories.push($("#add").val().trim());
+        $("#" + currentPage).addClass("btn-secondary");
+        currentPage = $("#add").val().trim().split(" ").join("");
         $("#categories").append($("<button>")
             .attr("type", "button")
+            .attr("id", currentPage)
             .addClass("btn btn-secondary menu")
-            .html("#add").val());
-        selected = $("#add").val();
+            .html($("#add").val()));
+        $("#" + currentPage).removeClass("btn-secondary");
         $("#add").val('');
-        numGifs = 12;
         $("#img").empty();
-        getGifs(selected, numGifs);
+        getGifs(currentPage, 12);
+    }
+    if(categories.indexOf($("#add").val().trim()) != -1){
+        alert("That was already added");
+        $("#add").val("");
     }
     
 });
-
 $(document).on("click", ".menu", function(){
-    offset = 12;
+    offset = 0;
     selected = $(this).text();
     $(this).removeClass("btn-secondary");
     $("#" + currentPage).addClass("btn-secondary");
@@ -63,8 +63,7 @@ $(document).on("click", ".menu", function(){
 $(document).on("click", "#load-more", function(){
     offset += 12;
     imgNum = offset;
-    // numGifs += 12;
-    getGifs(selected, offset);
+    getGifs(currentPage, offset);
     $("#load-more").detach();
 });
 
@@ -79,12 +78,29 @@ $(document).on("click", "img", function(){
     }
 })
 
-for(i=0; i<categories.length; i++){
+function setButtons(){
+    for(i=0; i<categories.length; i++){
+        $("#categories").prepend(
+            $("<button>").attr("type", "button")
+            .addClass("btn btn-secondary menu")
+            .text(categories[i])
+            .attr("id", categories[i].split(" ").join(""))
+        );
+    }
     $("#categories").prepend(
         $("<button>").attr("type", "button")
-        .addClass("btn btn-secondary menu")
-        .text(categories[i])
-        .attr("id", categories[i]));
+            .addClass("btn btn-secondary    ")
+            .text("Favorites")
+            .attr("id", "favorites")
+    );
 }
 
-getGifs(categories[Math.floor(Math.random() * categories.length)], 12);
+function loadPage(){
+    var startPage = categories[Math.floor(Math.random() * categories.length)];
+    currentPage = startPage.split(" ").join("");
+    $("#" + currentPage).removeClass("btn-secondary");
+    getGifs(currentPage, offset);
+}
+
+setButtons();
+loadPage();
